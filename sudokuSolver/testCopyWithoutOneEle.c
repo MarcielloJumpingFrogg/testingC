@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 int copyWithout(int *array, int num) {
     int *newArray = malloc((sizeof(*array) - 1)*sizeof(int));
@@ -29,10 +30,32 @@ int copyWithout(int *array, int num) {
     //return newArray;//cant return an array bcs it's multiple characters
 }
 
+
+void copyStringWithout(char *array, char toRemove) {
+    char newArray[10];
+    int counter = 0;
+    for(int i = 0; array[i] != '\0'; i++) {
+        if(array[i] != toRemove) {
+            newArray[counter] = array[i];
+            counter++;
+        }
+    } 
+
+    strcpy(array, newArray);
+}
+
+
 int main() {
 
-    int array[] = {1,2,3,4,5,6,7,8,9};
+    char array[] = {"123456789"};
 
-    copyWithout(array, 5);
+    copyStringWithout(array, '5');
+
+    for (int i = 0; i < 9; i++) {
+        printf("%c ", array[i]);
+    }
+
+
+    printf("\n");
 
 }

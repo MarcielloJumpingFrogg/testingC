@@ -7,7 +7,7 @@ struct sudokuTemplate
     int horizontalGroup;
     int verticalGroup;
     int blockGroup;
-    int possibleCharacters[9];
+    char possibleCharacters[10];
     char confirmedChar;
 };
 
@@ -35,28 +35,23 @@ int main() {
     cleanPossibleCharsWholeTable(sudoku);
 }
 
-int copyWithout(int *array, int num) {
-    int *newArray = malloc((sizeof(*array) - 1)*sizeof(int));
-    int counter = 0;
-    for (int i = 0; i < sizeof(*array); i++) {
-        if(array[i] != num){
+void copyWithoutChar(char *array, char element) {
+    char newArray[10];
+    int counter = 0; 
+    
+    for (int i = 0 ; array[i] != '\0'; i++) {
+        if(array[i] != element) {
             newArray[counter] = array[i];
             counter++;
         }
+
+        strcpy(array, newArray);
     }
-
-    /* 
-        array from a to z is array[n]
-            
-    */
-
-    return newArray;//cant return an array bcs it's multiple characters
 }
 
-
-void removeCharFromHorGroup(struct sudokuTemplate (*sudoku)[9], int coord, int num) {
+void removeCharFromHorGroup(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
     for(int j = 0; j < 9; j++){
-        sudoku[coord][j].possibleCharacters;
+        copyWithoutChar(sudoku[coord][j].possibleCharacters, toRemove);
     }
 }
 
@@ -66,8 +61,7 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
         for (int j = 0; j < 9; j++) {
             if (sudoku[i][j].confirmedChar != '.') {
                 char toRemove = sudoku[i][j].confirmedChar;
-                int intToRemove = toRemove - '0';
-                removeCharFromHorGroup(sudoku, i, intToRemove);
+                removeCharFromHorGroup(sudoku, i, toRemove);
             }
         }
     }
@@ -111,9 +105,7 @@ void getInitialSudokuFromOneLine(struct sudokuTemplate (*destination)[9]) {
             if (string[counter] == '.'){
                 //strcpy(destination[i][j].possibleCharacters[], {'1', 2});
 
-                for (int num = 1; num <= 9; num++) {
-                    destination[i][j].possibleCharacters[num] = num;
-                }
+                strcpy(destination[i][j].possibleCharacters, "123456789");
                 destination[i][j].confirmedChar = '.';
             }
             else {
