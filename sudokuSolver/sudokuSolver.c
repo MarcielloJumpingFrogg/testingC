@@ -62,6 +62,8 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
             if (sudoku[i][j].confirmedChar != '.') {
                 char toRemove = sudoku[i][j].confirmedChar;
                 removeCharFromHorGroup(sudoku, i, toRemove);
+                //removeCharFromVertical
+                //removeCharFromBlock
             }
         }
     }
