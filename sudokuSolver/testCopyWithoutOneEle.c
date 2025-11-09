@@ -33,6 +33,7 @@ int copyWithout(int *array, int num) {
 
 void copyStringWithout(char *array, char toRemove) {
     char newArray[10];
+    printf("newArray: %s\n", newArray);
     int counter = 0;
     for(int i = 0; array[i] != '\0'; i++) {
         if(array[i] != toRemove) {
@@ -40,6 +41,7 @@ void copyStringWithout(char *array, char toRemove) {
             counter++;
         }
     } 
+
 
     strcpy(array, newArray);
 }
@@ -49,11 +51,15 @@ int main() {
 
     char array[] = {"123456789"};
 
+    printf("string : %s\n", array);
+
     copyStringWithout(array, '5');
 
     for (int i = 0; i < 9; i++) {
         printf("%c ", array[i]);
     }
+
+    printf("\nstring: %s\n", array);
 
 
     printf("\n");

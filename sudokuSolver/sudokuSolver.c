@@ -20,6 +20,10 @@ void separateByGroups(struct sudokuTemplate (*sudoku)[9]);
 
 void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]);
 
+void cleanPossChars(struct sudokuTemplate (*sudoku)[9], int i, int j);
+
+void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]);
+
 
 int copyWithout(int *array, int num);
 
@@ -33,10 +37,12 @@ int main() {
     visualizeSudoku(sudoku);
 
     cleanPossibleCharsWholeTable(sudoku);
+
+    insertSinglePossChar(sudoku);
 }
 
 void copyWithoutChar(char *array, char element) {
-    char newArray[10];
+    char newArray[10] = "         ";
     int counter = 0; 
     
     for (int i = 0 ; array[i] != '\0'; i++) {
@@ -49,10 +55,36 @@ void copyWithoutChar(char *array, char element) {
     }
 }
 
-void removeCharFromHorGroup(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
-    for(int j = 0; j < 9; j++){
-        copyWithoutChar(sudoku[coord][j].possibleCharacters, toRemove);
+void horizontalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
+    for(int i = 0; i < 9; i++){
+        copyWithoutChar(sudoku[coord][i].possibleCharacters, toRemove);
     }
+}
+
+void verticalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
+    for(int j = 0; j < 9; j++){
+        copyWithoutChar(sudoku[j][coord].possibleCharacters, toRemove);
+    }
+}
+
+void blockRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int group, char toRemove) {
+    for (int i = 0 ; i < 9; i++) {
+        for (int j = 0; j < 9; j++ ) {
+            if (sudoku[i][j].blockGroup == group) {
+                copyWithoutChar(sudoku[i][j].possibleCharacters, toRemove);
+            }
+        }
+    }
+}
+
+
+void cleanPossChars(struct sudokuTemplate (*sudoku)[9], int i, int j) {
+    char toRemove = sudoku[i][j].confirmedChar;
+    int groupOfConfirmedChar = sudoku[i][j].blockGroup;
+    
+    horizontalRemovalOfPossChars(sudoku, i, toRemove);
+    verticalRemovalOfPossChars(sudoku, j , toRemove);
+    blockRemovalOfPossChars(sudoku, groupOfConfirmedChar, toRemove);
 }
 
 
@@ -60,10 +92,7 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (sudoku[i][j].confirmedChar != '.') {
-                char toRemove = sudoku[i][j].confirmedChar;
-                removeCharFromHorGroup(sudoku, i, toRemove);
-                //removeCharFromVertical
-                //removeCharFromBlock
+                cleanPossChars(sudoku, i, j);
             }
         }
     }
@@ -71,32 +100,22 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
 
 
 
+void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0; j < 9; j++) {
+            if(strlen(sudoku[i][j].possibleCharacters) == 1) {
+                sudoku[i][j].confirmedChar = sudoku[i][j].possibleCharacters[0];
+                strcpy(sudoku[i][j].possibleCharacters, "");
 
-void visualizeSudoku(struct sudokuTemplate (*sudoku)[9]) {
-    for (int i = 0; i < 9; i++){
-        for (int j = 0; j < 9; j++){
-            printf("%c ", sudoku[i][j].confirmedChar);
-            if( j ==2  || j == 5) {
-                printf(" | ");
+                printf("debug: i = %d, j = %d \n", i, j);
+                printf("poss.chars = %c", sudoku[i][j].possibleCharacters[0]);
+                visualizeSudoku(sudoku);
             }
         }
-        printf("\n");
-
-        if(i == 2 || i == 5) {
-            for ( int x = 0; x < 23; x++) {
-                if (x == 7 || x == 16){
-                    printf("+");
-                }
-                else{
-                    printf("-");
-                }
-            }
-            printf("\n");
-            //printf("------------------------\n");
-        }
-
     }
 }
+
+
 
 
 void getInitialSudokuFromOneLine(struct sudokuTemplate (*destination)[9]) {
@@ -158,4 +177,33 @@ void separateByGroups(struct sudokuTemplate (*sudoku)[9]) {
             //add the 2 differences in coords from i and j
         }
     }
+}
+
+
+
+void visualizeSudoku(struct sudokuTemplate (*sudoku)[9]) {
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 9; j++){
+            printf("%c ", sudoku[i][j].confirmedChar);
+            if( j ==2  || j == 5) {
+                printf(" | ");
+            }
+        }
+        printf("\n");
+
+        if(i == 2 || i == 5) {
+            for ( int x = 0; x < 23; x++) {
+                if (x == 7 || x == 16){
+                    printf("+");
+                }
+                else{
+                    printf("-");
+                }
+            }
+            printf("\n");
+            //printf("------------------------\n");
+        }
+
+    }
+    printf("\v");
 }
