@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 struct sudokuTemplate
 {
@@ -24,10 +25,16 @@ void cleanPossChars(struct sudokuTemplate (*sudoku)[9], int i, int j);
 
 void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]);
 
+void wholeTableDebug(struct sudokuTemplate (*sudoku)[9]);
+
+void checkHiddenSingleChars(struct sudokuTemplate (*sudoku)[9]);
+
 
 int copyWithout(int *array, int num);
 
 int main() {
+    bool resolving = true;
+
     struct sudokuTemplate sudoku[9][9];
 
     getInitialSudokuFromOneLine(sudoku);
@@ -38,36 +45,75 @@ int main() {
 
     cleanPossibleCharsWholeTable(sudoku);
 
-    insertSinglePossChar(sudoku);
+    while(resolving) {
+        insertSinglePossChar(sudoku); 
+        //wholeTableDebug(sudoku);
+    }
+
+
+    
+    
 }
 
 void copyWithoutChar(char *array, char element) {
-    char newArray[10] = "         ";
+
+    if(array[0] == '0') {
+        return;
+    }
+
+    char *newArray = malloc(sizeof(array));
     int counter = 0; 
     
-    for (int i = 0 ; array[i] != '\0'; i++) {
+    for (int i = 0 ; i<9; i++) {
         if(array[i] != element) {
             newArray[counter] = array[i];
             counter++;
         }
+    }
+    newArray[counter + 1] = '\0';
 
-        strcpy(array, newArray);
+        
+    strcpy(array, newArray);
+    free(newArray);
+}
+
+
+void debugPossChar(struct sudokuTemplate (*sudoku)[9], int i, int j) {
+
+    if(sudoku[i][j].possibleCharacters[0] == '0') {
+        return;
+    }
+
+    printf("Remaining possible Characters at i[%d] j[%d]: ", i, j);
+    for(int x = 0; sudoku[i][j].possibleCharacters[x] != '\0'; x++) {
+        printf(" %c ", sudoku[i][j].possibleCharacters[x]);
+    }
+
+    printf("\n");
+}
+
+void wholeTableDebug(struct sudokuTemplate (*sudoku)[9]) {
+    for (int i = 0; i < 9; i++) {
+        for (int j = 0 ; j < 9; j++) {
+            debugPossChar(sudoku, i, j);
+        }
     }
 }
 
-void horizontalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
+
+int horizontalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
     for(int i = 0; i < 9; i++){
         copyWithoutChar(sudoku[coord][i].possibleCharacters, toRemove);
     }
 }
 
-void verticalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
+int verticalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
     for(int j = 0; j < 9; j++){
         copyWithoutChar(sudoku[j][coord].possibleCharacters, toRemove);
     }
 }
 
-void blockRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int group, char toRemove) {
+int blockRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int group, char toRemove) {
     for (int i = 0 ; i < 9; i++) {
         for (int j = 0; j < 9; j++ ) {
             if (sudoku[i][j].blockGroup == group) {
@@ -88,14 +134,19 @@ void cleanPossChars(struct sudokuTemplate (*sudoku)[9], int i, int j) {
 }
 
 
+
 void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
-            if (sudoku[i][j].confirmedChar != '.') {
+            if (sudoku[i][j].confirmedChar >= 49 && sudoku[i][j].confirmedChar <= 57) {
+                //printf("confirmed char for i[%d] and j[%d] is : %c \n", i, j, sudoku[i][j].confirmedChar);
                 cleanPossChars(sudoku, i, j);
-            }
+                
+            }//debugPossChar(sudoku,i,j);
         }
     }
+
+    //wholeTableDebug(sudoku);
 }
 
 
@@ -103,16 +154,24 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
 void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
-            if(strlen(sudoku[i][j].possibleCharacters) == 1) {
+            if(strlen(sudoku[i][j].possibleCharacters) == 1 && sudoku[i][j].possibleCharacters[0] != '0') {
+                printf("single char: %c\n",sudoku[i][j].possibleCharacters[0]);
                 sudoku[i][j].confirmedChar = sudoku[i][j].possibleCharacters[0];
-                strcpy(sudoku[i][j].possibleCharacters, "");
+                strcpy(sudoku[i][j].possibleCharacters, "0");
 
                 printf("debug: i = %d, j = %d \n", i, j);
-                printf("poss.chars = %c", sudoku[i][j].possibleCharacters[0]);
-                visualizeSudoku(sudoku);
+                printf("poss.chars = %c\n", sudoku[i][j].possibleCharacters[0]);
+                
+                cleanPossChars(sudoku, i, j);
+
+                //visualizeSudoku(sudoku);
             }
         }
     }
+}
+
+void checkHiddenSingleChars(struct sudokuTemplate (*sudoku)[9]) {
+    int groupBlocks[] = {0,1,2,3,4,5,6,7,8};
 }
 
 
@@ -124,15 +183,15 @@ void getInitialSudokuFromOneLine(struct sudokuTemplate (*destination)[9]) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if (string[counter] == '.'){
-                //strcpy(destination[i][j].possibleCharacters[], {'1', 2});
-
+            
                 strcpy(destination[i][j].possibleCharacters, "123456789");
-                destination[i][j].confirmedChar = '.';
             }
             else {
-                destination[i][j].confirmedChar = string[counter];
+                strcpy(destination[i][j].possibleCharacters, "0\0");
             }
-            //destination[i][j] = string[counter];
+            
+            destination[i][j].confirmedChar = string[counter];
+
             counter++;
         }
     }
