@@ -27,7 +27,7 @@ void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]);
 
 void wholeTableDebug(struct sudokuTemplate (*sudoku)[9]);
 
-void checkHiddenSingleChars(struct sudokuTemplate (*sudoku)[9]);
+void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]);
 
 
 int copyWithout(int *array, int num);
@@ -164,14 +164,31 @@ void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
                 
                 cleanPossChars(sudoku, i, j);
 
-                //visualizeSudoku(sudoku);
+                visualizeSudoku(sudoku);
+
             }
         }
     }
 }
 
-void checkHiddenSingleChars(struct sudokuTemplate (*sudoku)[9]) {
-    int groupBlocks[] = {0,1,2,3,4,5,6,7,8};
+void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]) {
+    for (int i = 0; i < 9; i = i + 3) {
+        for (int j = 0; j < 9; j = j + 3) {
+            //viaggia di gruppo in gruppo //   sinistra => destra && alto => basso
+
+            char charsToFind = "123456789";
+
+            for (int k = 0; k < 3; k++) {
+                for (int y = 0; y < 3; y++) {
+                    //viaggia interno ad un blocchetto
+                    
+                }
+                printf("\n");
+            }
+                printf("\n");
+            
+        }
+    }
 }
 
 
