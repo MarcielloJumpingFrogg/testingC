@@ -160,44 +160,56 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
 }
 
 
-void findHiddenChars(struct sudokuTemplate (*sudoku)[9]) {  
-    for (int i = 0; i < 9; i = i + 3) {
-        for (int j = 0; j < 9; j = j + 3) {
-            
+void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array) {
+    for(int x = 0; x < 3; x++) {
+        for (int y = 0; y < 3 ; y++) {
+            //check array in array
+            //modify the pointer to the COPY of the possible chars, and then once it finishes
+            // i will check the lenght 
+            // if len == 1 then i will change the conf char to that ecc 
+            //i wanna sleep now
+        }
+    }
+}
 
-            
-            char possChars[] = {"123456789"};
-            char alreadyFound[10];
+void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {  
+    for (int i = 0; i < 9; i = i + 3) {         // Big block
+        for (int j = 0; j < 9; j = j + 3) {     // Big block
 
-            for (int x = 0; x < 3; x ++) {
-                for ( int y = 0; y < 3; y ++) {
+
+            for (int x = 0; x < 3; x ++) {          //small block
+                for ( int y = 0; y < 3; y ++) {     //small block
+                    //sum toghether to obtain the coords
+
+                    if(sudoku[i + x][j + y].confirmedChar =='.') {
+                        char copyOfCandidate[] = sudoku[i + x][j + y].possibleCharacters;
+                        findHidden(sudoku, i, j, copyOfCandidate);
+                    }
 
                     for (int k = 0; sudoku[i + x][j + y].possibleCharacters[k] != '\0'; k++) {
                         char currentChar = sudoku[i + x][j + y].possibleCharacters[k];
                         
-                        int result = positionContained(possChars, currentChar);
 
-                        if (result == -1) {
-                            if(alreadyFound[result] == currentChar) {
-                                copyWithoutChar(possChars, currentChar);
-                            }
-                            else {
-                                alreadyFound[result] = possChars[result];
-                            }
-                        }
                     }
                 }
             }
 
-            if (strlen(possChars) == 1) {
-                //found one single char that goes here ==> so you need to add it to the confirmed chars 
-            }
     }
 
 }}
 
 
+/* 
+    TODO: should be: insert single poss {if len == 1 allora insert}
 
+    and change the other part of the function with:
+    
+    function removeLine&Col
+    {
+        blabla
+    }
+        
+*/
 void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
@@ -209,7 +221,7 @@ void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
                 printf("debug: i = %d, j = %d \n", i, j);
                 printf("poss.chars = %c\n", sudoku[i][j].possibleCharacters[0]);
                 
-                cleanPossChars(sudoku, i, j);
+                cleanPossChars(sudoku, i, j);   //TODO: cleanPossChars is a great example of why insertSingleChar should be global #facepalm
 
                 visualizeSudoku(sudoku);
 
