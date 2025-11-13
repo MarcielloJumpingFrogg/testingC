@@ -30,7 +30,6 @@ void wholeTableDebug(struct sudokuTemplate (*sudoku)[9]);
 void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]);
 
 
-int copyWithout(int *array, int num);
 
 int main() {
     bool resolving = true;
@@ -47,6 +46,7 @@ int main() {
 
     while(resolving) {
         insertSinglePossChar(sudoku); 
+        //findHiddenChars(sudoku);
         //wholeTableDebug(sudoku);
     }
 
@@ -75,6 +75,16 @@ void copyWithoutChar(char *array, char element) {
         
     strcpy(array, newArray);
     free(newArray);
+}
+
+
+int positionContained(char *array, char element) {
+    for (int i = 0; array[i] != '\0'; i++) {
+        if(array[i] == element){
+            return i;
+        }
+    }
+    return -1;
 }
 
 
@@ -150,6 +160,43 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
 }
 
 
+void findHiddenChars(struct sudokuTemplate (*sudoku)[9]) {  
+    for (int i = 0; i < 9; i = i + 3) {
+        for (int j = 0; j < 9; j = j + 3) {
+            
+
+            
+            char possChars[] = {"123456789"};
+            char alreadyFound[10];
+
+            for (int x = 0; x < 3; x ++) {
+                for ( int y = 0; y < 3; y ++) {
+
+                    for (int k = 0; sudoku[i + x][j + y].possibleCharacters[k] != '\0'; k++) {
+                        char currentChar = sudoku[i + x][j + y].possibleCharacters[k];
+                        
+                        int result = positionContained(possChars, currentChar);
+
+                        if (result == -1) {
+                            if(alreadyFound[result] == currentChar) {
+                                copyWithoutChar(possChars, currentChar);
+                            }
+                            else {
+                                alreadyFound[result] = possChars[result];
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (strlen(possChars) == 1) {
+                //found one single char that goes here ==> so you need to add it to the confirmed chars 
+            }
+    }
+
+}}
+
+
 
 void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i++) {
@@ -171,7 +218,7 @@ void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
     }
 }
 
-void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]) {
+/* void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i = i + 3) {
         for (int j = 0; j < 9; j = j + 3) {
             //viaggia di gruppo in gruppo //   sinistra => destra && alto => basso
@@ -189,7 +236,7 @@ void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]) {
             
         }
     }
-}
+} */
 
 
 
