@@ -27,7 +27,7 @@ void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]);
 
 void wholeTableDebug(struct sudokuTemplate (*sudoku)[9]);
 
-void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]);
+void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]);
 
 
 
@@ -46,10 +46,23 @@ int main() {
 
     while(resolving) {
         insertSinglePossChar(sudoku); 
-        //findHiddenChars(sudoku);
-        //wholeTableDebug(sudoku);
+        findCandidateInBlock(sudoku);
+        insertSinglePossChar(sudoku);
+        
+        
+         
+        findCandidateInBlock(sudoku);
+        insertSinglePossChar(sudoku); 
+        findCandidateInBlock(sudoku);
+        insertSinglePossChar(sudoku); 
+        findCandidateInBlock(sudoku);
+        insertSinglePossChar(sudoku); 
+        findCandidateInBlock(sudoku);
+        insertSinglePossChar(sudoku);
+        resolving = false;
     }
-
+    wholeTableDebug(sudoku);
+    
 
     
     
@@ -78,6 +91,9 @@ void copyWithoutChar(char *array, char element) {
 }
 
 
+void insertChar(struct sudokuTemplate(*sudoku)[9], int i, int j);
+
+
 int positionContained(char *array, char element) {
     for (int i = 0; array[i] != '\0'; i++) {
         if(array[i] == element){
@@ -90,7 +106,7 @@ int positionContained(char *array, char element) {
 
 void debugPossChar(struct sudokuTemplate (*sudoku)[9], int i, int j) {
 
-    if(sudoku[i][j].possibleCharacters[0] == '0') {
+    if(sudoku[i][j].confirmedChar != '.') {
         return;
     }
 
@@ -160,9 +176,25 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
 }
 
 
-void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array) {
+void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array, int *coordsOfCandidate) {
     for(int x = 0; x < 3; x++) {
         for (int y = 0; y < 3 ; y++) {
+
+            if(sudoku[i + x][j + y].confirmedChar == '.') {
+                for (int n = 0; sudoku[i + x][j + y].possibleCharacters[n] != '\0'; n++) {
+                    if((i+x) != coordsOfCandidate[0] && (j+y) != coordsOfCandidate[1]) {
+                        int result = positionContained(array, sudoku[i + x][j + y].possibleCharacters[n]);
+                        if(result != -1) {
+                            printf("Coords: i[%d] j[%d] (conf: %c)",i + x,j + y, sudoku[i + x][j + y].confirmedChar);
+                            printf("array: %s, char: %c\n", array, array[result]);
+                            copyWithoutChar(array, array[result]);
+                            printf("After: %s \n", array);
+                        }
+                        
+                    }
+                }
+            }
+
             //check array in array
             //modify the pointer to the COPY of the possible chars, and then once it finishes
             // i will check the lenght 
@@ -170,6 +202,8 @@ void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array) {
             //i wanna sleep now
         }
     }
+
+    
 }
 
 void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {  
@@ -182,8 +216,19 @@ void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {
                     //sum toghether to obtain the coords
 
                     if(sudoku[i + x][j + y].confirmedChar =='.') {
-                        char copyOfCandidate[] = sudoku[i + x][j + y].possibleCharacters;
-                        findHidden(sudoku, i, j, copyOfCandidate);
+                        char copyOfCandidate[10];
+                        strcpy(copyOfCandidate,  sudoku[i + x][j + y].possibleCharacters);
+                        int coordsOfCandidate[] = {i + x, j + y};
+                        findHidden(sudoku, i, j, copyOfCandidate, coordsOfCandidate);
+                        //printf("copy[%s] at: i[%d]j[%d]\n", copyOfCandidate , i  + x ,j + y);
+                        if(strlen(copyOfCandidate) == 1) {
+                            int coordX = i + x;
+                            int coordY = j + y;
+                            printf("found at i[%d]j[%d]\n",coordX, coordY);
+                            insertChar(sudoku, coordX, coordY);
+                            cleanPossChars(sudoku, coordX, coordY);
+                            visualizeSudoku(sudoku);
+                        }
                     }
 
                     for (int k = 0; sudoku[i + x][j + y].possibleCharacters[k] != '\0'; k++) {
@@ -210,13 +255,20 @@ void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {
     }
         
 */
+
+
+void insertChar(struct sudokuTemplate(*sudoku)[9], int i, int j) {
+    sudoku[i][j].confirmedChar = sudoku[i][j].possibleCharacters[0];
+    strcpy(sudoku[i][j].possibleCharacters, "0");
+}
+
+
 void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
             if(strlen(sudoku[i][j].possibleCharacters) == 1 && sudoku[i][j].possibleCharacters[0] != '0') {
                 printf("single char: %c\n",sudoku[i][j].possibleCharacters[0]);
-                sudoku[i][j].confirmedChar = sudoku[i][j].possibleCharacters[0];
-                strcpy(sudoku[i][j].possibleCharacters, "0");
+                insertChar(sudoku, i, j);
 
                 printf("debug: i = %d, j = %d \n", i, j);
                 printf("poss.chars = %c\n", sudoku[i][j].possibleCharacters[0]);
@@ -229,6 +281,8 @@ void insertSinglePossChar(struct sudokuTemplate (*sudoku)[9]) {
         }
     }
 }
+
+
 
 /* void checkHiddenSingleCharsInBlocks(struct sudokuTemplate (*sudoku)[9]) {
     for (int i = 0; i < 9; i = i + 3) {
