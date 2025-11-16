@@ -47,21 +47,21 @@ int main() {
     while(resolving) {
         insertSinglePossChar(sudoku); 
         findCandidateInBlock(sudoku);
-        insertSinglePossChar(sudoku);
+        /*insertSinglePossChar(sudoku);
         
         
          
         findCandidateInBlock(sudoku);
-        insertSinglePossChar(sudoku); 
+         insertSinglePossChar(sudoku); 
         findCandidateInBlock(sudoku);
         insertSinglePossChar(sudoku); 
         findCandidateInBlock(sudoku);
         insertSinglePossChar(sudoku); 
         findCandidateInBlock(sudoku);
-        insertSinglePossChar(sudoku);
+        insertSinglePossChar(sudoku); */
         resolving = false;
     }
-    wholeTableDebug(sudoku);
+    //wholeTableDebug(sudoku);
     
 
     
@@ -216,7 +216,7 @@ void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {
                     //sum toghether to obtain the coords
 
                     if(sudoku[i + x][j + y].confirmedChar =='.') {
-                        char copyOfCandidate[10];
+                        char *copyOfCandidate = malloc(strlen(sudoku[i + x][j + y].possibleCharacters));
                         strcpy(copyOfCandidate,  sudoku[i + x][j + y].possibleCharacters);
                         int coordsOfCandidate[] = {i + x, j + y};
                         findHidden(sudoku, i, j, copyOfCandidate, coordsOfCandidate);
@@ -229,6 +229,7 @@ void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {
                             cleanPossChars(sudoku, coordX, coordY);
                             visualizeSudoku(sudoku);
                         }
+                        free(copyOfCandidate);
                     }
 
                     for (int k = 0; sudoku[i + x][j + y].possibleCharacters[k] != '\0'; k++) {
