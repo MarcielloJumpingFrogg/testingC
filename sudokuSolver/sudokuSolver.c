@@ -189,21 +189,12 @@ void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array, i
                 printf("we are working on: i[%d], j[%d]\n", coordX, coordY   );
                 for (int n = 0; sudoku[i + x][j + y].possibleCharacters[n] != '\0'; n++) {
                     if((i+x) != coordX || (j+y) != coordY ) {
-                        int result = positionContained(array, sudoku[i + x][j + y].possibleCharacters[n]);
-                        printf ("the result is: %d, from the line of poss chars of :%s, in the array: %s\n", result, sudoku[i + x][j + y].possibleCharacters, array);
-                        printf("")
-                        //what do you mean, positionContained in here, isnt it supposed to do it's own stuff
-                        //this way i am changing the value of x and y, which means i am rescribing on top of something else since
-                        //the coords are thrown off
-                        if(result != -1) {
-                            printf("the poss char is: %c, while the coords of said char are: 1[%d] 2[%d] \n",sudoku[i + x][j + y].possibleCharacters[result], i + x, j + y);
-                            printf("idk: i[%d] x[%d] j[%d] y[%d]", i,x,j,y);
-                            printf("Coords: i[%d] j[%d] (conf: %c)",coordX,coordY, sudoku[coordX][coordY].confirmedChar);
-                            printf("array: %s, char: %c\n", array, array[result]);
-                            copyWithoutChar(array, array[result]);
-                            printf("After: %s \n", array);
-                        }
-                        
+                        printf("%s array before\n", array);
+                        printf("%c, is the Character trying to be removed, its from the array: %s, in the position i[%d] j[%d]\n", sudoku[i + x][j + y].possibleCharacters[n], sudoku[i + x][j + y].possibleCharacters, i + x, j 
+                               
+                               + y);
+                        copyWithoutChar(array, sudoku[i + x][j + y].possibleCharacters[n]); 
+                        printf("%s is the array now\n", array); 
                     }
                 }
             }
@@ -218,6 +209,33 @@ void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array, i
 
     
 }
+
+/*
+ *
+ *
+ *                        int result = positionContained(array, sudoku[i + x][j + y].possibleCharacters[n]);
+                        printf ("the result is: %d, from the line of poss chars of :%s, in the array: %s\n", result, sudoku[i + x][j + y].possibleCharacters, array);
+                        printf("")
+                        //what do you mean, positionContained in here, isnt it supposed to do it's own stuff
+                        //this way i am changing the value of x and y, which means i am rescribing on top of something else since
+                        //the coords are thrown off
+                        if(result != -1) {
+                            printf("the poss char is: %c, while the coords of said char are: 1[%d] 2[%d] \n",sudoku[i + x][j + y].possibleCharacters[result], i + x, j + y);
+                            printf("idk: i[%d] x[%d] j[%d] y[%d]", i,x,j,y);
+                            printf("Coords: i[%d] j[%d] (conf: %c)",coordX,coordY, sudoku[coordX][coordY].confirmedChar);
+                            printf("array: %s, char: %c\n", array, array[result]);
+                            copyWithoutChar(array, array[result]);
+                            printf("After: %s \n", array);
+                        }
+ 
+ *
+ *
+ *
+ *
+ *
+ *
+ * */
+
 
 void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {  
     for (int i = 0; i < 9; i = i + 3) {         // Big block
