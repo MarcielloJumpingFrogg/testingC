@@ -12,6 +12,9 @@ struct sudokuTemplate
     char confirmedChar;
 };
 
+//secondo te se mi metto ad ascoltare musica mi dice qualcosa?
+//non e' come quella la dici? 
+
 
 void getInitialSudokuFromOneLine(struct sudokuTemplate (*destination)[9]);
 
@@ -176,16 +179,26 @@ void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
 }
 
 
-void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array, int *coordsOfCandidate) {
+void findHidden(struct sudokuTemplate (*sudoku)[9], int i, int j, char *array, int coordX, int coordY ) {
+  
     for(int x = 0; x < 3; x++) {
         for (int y = 0; y < 3 ; y++) {
 
             if(sudoku[i + x][j + y].confirmedChar == '.') {
+                printf("the current array is %s", array);
+                printf("we are working on: i[%d], j[%d]\n", coordX, coordY   );
                 for (int n = 0; sudoku[i + x][j + y].possibleCharacters[n] != '\0'; n++) {
-                    if((i+x) != coordsOfCandidate[0] && (j+y) != coordsOfCandidate[1]) {
+                    if((i+x) != coordX || (j+y) != coordY ) {
                         int result = positionContained(array, sudoku[i + x][j + y].possibleCharacters[n]);
+                        printf ("the result is: %d, from the line of poss chars of :%s, in the array: %s\n", result, sudoku[i + x][j + y].possibleCharacters, array);
+                        printf("")
+                        //what do you mean, positionContained in here, isnt it supposed to do it's own stuff
+                        //this way i am changing the value of x and y, which means i am rescribing on top of something else since
+                        //the coords are thrown off
                         if(result != -1) {
-                            printf("Coords: i[%d] j[%d] (conf: %c)",i + x,j + y, sudoku[i + x][j + y].confirmedChar);
+                            printf("the poss char is: %c, while the coords of said char are: 1[%d] 2[%d] \n",sudoku[i + x][j + y].possibleCharacters[result], i + x, j + y);
+                            printf("idk: i[%d] x[%d] j[%d] y[%d]", i,x,j,y);
+                            printf("Coords: i[%d] j[%d] (conf: %c)",coordX,coordY, sudoku[coordX][coordY].confirmedChar);
                             printf("array: %s, char: %c\n", array, array[result]);
                             copyWithoutChar(array, array[result]);
                             printf("After: %s \n", array);
@@ -218,12 +231,12 @@ void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {
                     if(sudoku[i + x][j + y].confirmedChar =='.') {
                         char *copyOfCandidate = malloc(strlen(sudoku[i + x][j + y].possibleCharacters));
                         strcpy(copyOfCandidate,  sudoku[i + x][j + y].possibleCharacters);
-                        int coordsOfCandidate[] = {i + x, j + y};
-                        findHidden(sudoku, i, j, copyOfCandidate, coordsOfCandidate);
+//                        printf("the copy is: %s \n", copyOfCandidate);
+                        int coordX = i + x;
+                        int coordY = j + y;
+                        findHidden(sudoku, i, j, copyOfCandidate,coordX, coordY);
                         //printf("copy[%s] at: i[%d]j[%d]\n", copyOfCandidate , i  + x ,j + y);
                         if(strlen(copyOfCandidate) == 1) {
-                            int coordX = i + x;
-                            int coordY = j + y;
                             printf("found at i[%d]j[%d]\n",coordX, coordY);
                             insertChar(sudoku, coordX, coordY);
                             cleanPossChars(sudoku, coordX, coordY);
@@ -232,11 +245,6 @@ void findCandidateInBlock(struct sudokuTemplate (*sudoku)[9]) {
                         free(copyOfCandidate);
                     }
 
-                    for (int k = 0; sudoku[i + x][j + y].possibleCharacters[k] != '\0'; k++) {
-                        char currentChar = sudoku[i + x][j + y].possibleCharacters[k];
-                        
-
-                    }
                 }
             }
 
