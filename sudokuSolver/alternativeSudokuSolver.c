@@ -1,63 +1,37 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <math.h>
 
 
+void getInitialSudokuFromOneLine(char destination[9][9]);
+void copyWithoutChar(char *array, char element);
 
-struct sudokuTemplate
-{
-    int horizontalGroup;
-    int verticalGroup;
-    int blockGroup;
-    char possibleCharacters[10];
-    char confirmedChar;
-};
+void visualizeSudoku(char sudoku[9][9]);
 
+void checkGameStatus(char sudoku[9][9], bool *resolving); 
+char getPossibleChars(char sudoku[9][9], int xCoord, int yCoord);
+char blockCharsFound(char sudoku[9][9], int xCoord, int yCoord);
 
-void cleanPossChars(struct sudokuTemplate (*sudoku)[9], int i, int j) {
-    char toRemove = sudoku[i][j].confirmedChar;
-    int groupOfConfirmedChar = sudoku[i][j].blockGroup;
-    
-    horizontalRemovalOfPossChars(sudoku, i, toRemove);
-    verticalRemovalOfPossChars(sudoku, j , toRemove);
-    blockRemovalOfPossChars(sudoku, groupOfConfirmedChar, toRemove);
+int main() {
+    char sudoku[9][9];
+    getInitialSudokuFromOneLine(sudoku);
+    visualizeSudoku(sudoku);
+    blockCharsFound(sudoku, 8, 8);
 }
 
-
-
-void cleanPossibleCharsWholeTable(struct sudokuTemplate (*sudoku)[9]) {
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 9; j++) {
-            if (sudoku[i][j].confirmedChar >= 49 && sudoku[i][j].confirmedChar <= 57) {
-                //printf("confirmed char for i[%d] and j[%d] is : %c \n", i, j, sudoku[i][j].confirmedChar);
-                cleanPossChars(sudoku, i, j);
-                
-            }
-        }
-    }
-
-}
-
-
-
-void getInitialSudokuFromOneLine(struct sudokuTemplate (*destination)[9]) {
+void getInitialSudokuFromOneLine(char destination[9][9]) {
     char string[] = "..7..93..4..7.81..1...3..4..5...78.6....41.9....6....5......76.........8.89......";
     int counter = 0;
     for (int i = 0; i < 9; i++) {
         for (int j = 0; j < 9; j++) {
-            if (string[counter] == '.'){
-            
-                strcpy(destination[i][j].possibleCharacters, "123456789");
-            }
-            else {
-                strcpy(destination[i][j].possibleCharacters, "0\0");
-            }
-            
-            destination[i][j].confirmedChar = string[counter];
-
+           
+            destination[i][j] = string[counter];
             counter++;
         }
     }
 }
+
 
 void copyWithoutChar(char *array, char element) {
 
@@ -82,54 +56,10 @@ void copyWithoutChar(char *array, char element) {
 }
 
 
-
-
-void separateByGroups(struct sudokuTemplate (*sudoku)[9]) {
-
-
-    for (int i = 0; i < 9; i++) {
-        for (int j = 0; j < 9; j++) {
-            
-            sudoku[i][j].horizontalGroup = i;
-            sudoku[i][j].verticalGroup = j;
-
-            sudoku[i][j].blockGroup = 0;
-
-
-            //separating by the coordinates since the order is 012345678 i add the coordinates
-            //it's the only way i found and i don't know how to write it cleaner
-            if (i >= 3 && i <= 5){
-                sudoku[i][j].blockGroup += 1;
-            }
-            else{
-                if(i >= 6){
-                    sudoku[i][j].blockGroup += 2;
-                }
-            }
-
-            if (j >= 3 && j <= 5){
-                sudoku[i][j].blockGroup += 3;
-            }
-            else{
-                if(j >= 6){
-                    sudoku[i][j].blockGroup += 6;
-                }
-            }
-
-            //set horizontal j
-            //set vertical i
-
-            //add the 2 differences in coords from i and j
-        }
-    }
-}
-
-
-
-void visualizeSudoku(struct sudokuTemplate (*sudoku)[9]) {
+void visualizeSudoku(char sudoku[9][9]) {
     for (int i = 0; i < 9; i++){
         for (int j = 0; j < 9; j++){
-            printf("%c ", sudoku[i][j].confirmedChar);
+            printf("%c ", sudoku[i][j]);
             if( j ==2  || j == 5) {
                 printf(" | ");
             }
@@ -146,46 +76,16 @@ void visualizeSudoku(struct sudokuTemplate (*sudoku)[9]) {
                 }
             }
             printf("\n");
-            //printf("------------------------\n");
         }
 
     }
     printf("\v");
 }
 
-int horizontalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
-    for(int i = 0; i < 9; i++){
-        copyWithoutChar(sudoku[coord][i].possibleCharacters, toRemove);
-    }
-}
-
-int verticalRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int coord, char toRemove) {
-    for(int j = 0; j < 9; j++){
-        copyWithoutChar(sudoku[j][coord].possibleCharacters, toRemove);
-    }
-}
-
-int blockRemovalOfPossChars(struct sudokuTemplate (*sudoku)[9], int group, char toRemove) {
-    for (int i = 0 ; i < 9; i++) {
-        for (int j = 0; j < 9; j++ ) {
-            if (sudoku[i][j].blockGroup == group) {
-                copyWithoutChar(sudoku[i][j].possibleCharacters, toRemove);
-            }
-        }
-    }
-}
-
-
-void insertChar(struct sudokuTemplate(*sudoku)[9], int i, int j) {
-    sudoku[i][j].confirmedChar = sudoku[i][j].possibleCharacters[0];
-    strcpy(sudoku[i][j].possibleCharacters, "0");
-    cleanPossChars(sudoku, i , j);
-}
-
-void checkGameStatus(struct sudokuTemplate (*sudoku)[9], bool *resolving) {
+void checkGameStatus(char sudoku[9][9], bool *resolving) {
     for (int i = 0; i < 9; i++ ){
         for (int j = 0; j < 9; j++){
-            if (sudoku[i][j].confirmedChar == '.') {
+            if (sudoku[i][j] == '.') {
                 return;
             }
         }
@@ -193,14 +93,65 @@ void checkGameStatus(struct sudokuTemplate (*sudoku)[9], bool *resolving) {
     *resolving = false;
 }
 
-int main() {
 
+
+char verticalCharsFound(char sudoku[9][9], int xCoord) {
+    char foundChars[9] = {};
+    for (int i = 0; i < 9; i++) {
+        foundChars[i] = sudoku[i][xCoord]; 
+    }
+    return *foundChars; }
+
+char horizontalCharsFound(char sudoku[9][9], int yCoord) {
+    char foundChars[9] = {};
+    for (int i = 0; i < 9; i++) {
+        foundChars[i] = sudoku[yCoord][i]; 
+    }
+    return *foundChars;
+}
+
+char blockCharsFound(char sudoku[9][9], int xCoord, int yCoord) {
+    int xfirstCoord = 3 * floor(xCoord/3);
+    int yfirstCoord = 3 * floor(yCoord/3);
+    
+    for (int i = 0; i < 3; i++){
+        for (int j = 0; j < 3; j++){
+            if() //let me save the thoughts i had
+            /*
+             *TODO: using xfirstCoord + i and yfirstCoord + j posso navigare dentro al blocco in questione
+                    usando un if coords != da coords in input allora aggiungiti i caratteri e return them
+             * */
+        }
+        printf("\n");
+    }
 }
 
 
 
-void recursiveInsertion(struct sudokuTemplate (*sudoku)[9]) {
+char getPossibleChars(char sudoku[9][9], int xCoord, int yCoord) {
+   verticalCharsFound(sudoku, 2); 
+
+}
+
+void recursiveInsertion(char sudoku[9][9]) {
     //qua voglio inserire uno dei caratteri che sono disponibili all'interno di possChars 
     //
     //e andare avanti fino a quando non trovo che non posso inserire altri caratteri 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
