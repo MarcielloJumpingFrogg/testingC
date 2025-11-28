@@ -10,14 +10,13 @@ void copyWithoutChar(char *array, char element);
 void visualizeSudoku(char sudoku[9][9]);
 
 void checkGameStatus(char sudoku[9][9], bool *resolving); 
-char getPossibleChars(char sudoku[9][9], int xCoord, int yCoord);
-char blockCharsFound(char sudoku[9][9], int xCoord, int yCoord);
+void recursiveInsertion(char sudoku[9][9]);
 
 int main() {
     char sudoku[9][9];
     getInitialSudokuFromOneLine(sudoku);
     visualizeSudoku(sudoku);
-    blockCharsFound(sudoku, 8, 8);
+    recursiveInsertion(sudoku);
 }
 
 void getInitialSudokuFromOneLine(char destination[9][9]) {
@@ -95,63 +94,58 @@ void checkGameStatus(char sudoku[9][9], bool *resolving) {
 
 
 
-char verticalCharsFound(char sudoku[9][9], int xCoord) {
-    char foundChars[9] = {};
+void verticalCharsFound(char sudoku[9][9], int xCoord, char *possChars) {
     for (int i = 0; i < 9; i++) {
-        foundChars[i] = sudoku[i][xCoord]; 
+        copyWithoutChar(possChars, sudoku[i][xCoord]);
     }
-    return *foundChars; }
-
-char horizontalCharsFound(char sudoku[9][9], int yCoord) {
-    char foundChars[9] = {};
-    for (int i = 0; i < 9; i++) {
-        foundChars[i] = sudoku[yCoord][i]; 
-    }
-    return *foundChars;
 }
 
-char blockCharsFound(char sudoku[9][9], int xCoord, int yCoord) {
+void horizontalCharsFound(char sudoku[9][9], int yCoord, char *possChars) {
+    for (int i = 0; i < 9; i++) {
+        copyWithoutChar(possChars, sudoku[yCoord][i]);
+    }
+}
+
+void blockCharsFound(char sudoku[9][9], int xCoord, int yCoord, char *possChars) {
     int xfirstCoord = 3 * floor(xCoord/3);
     int yfirstCoord = 3 * floor(yCoord/3);
     
     for (int i = 0; i < 3; i++){
         for (int j = 0; j < 3; j++){
-            if() //let me save the thoughts i had
-            /*
-             *TODO: using xfirstCoord + i and yfirstCoord + j posso navigare dentro al blocco in questione
-                    usando un if coords != da coords in input allora aggiungiti i caratteri e return them
-             * */
+            if(xfirstCoord + i != xCoord || yfirstCoord + j != yCoord)
+            {
+                copyWithoutChar(possChars, sudoku[i][xCoord]);
+            }
+                
         }
-        printf("\n");
     }
 }
 
 
 
-char getPossibleChars(char sudoku[9][9], int xCoord, int yCoord) {
-   verticalCharsFound(sudoku, 2); 
-
+void getPossibleChars(char sudoku[9][9], int xCoord, int yCoord, char *possChars) {
+    verticalCharsFound(sudoku, xCoord , possChars);
+    horizontalCharsFound(sudoku, yCoord, possChars);
+    blockCharsFound(sudoku, xCoord, yCoord, possChars);
 }
 
 void recursiveInsertion(char sudoku[9][9]) {
+    for (int i = 0; i < 9; i++){
+        for (int j = 0; j < 9; j++) {
+            if(sudoku[i][j] == '.'){
+                char possChars[9] = {"123456789"};
+                getPossibleChars(sudoku, i, j, possChars);
+                printf("i[%d], j[%d], poss: %s \n", i, j, possChars);
+            }
+
+        }
+    }
+
+    //getPossibleChars and then use one of them to insert and blabla
     //qua voglio inserire uno dei caratteri che sono disponibili all'interno di possChars 
+    //
+    //
     //
     //e andare avanti fino a quando non trovo che non posso inserire altri caratteri 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
